@@ -1,0 +1,117 @@
+import prettier from 'prettier'
+import fs from 'fs'
+import path from 'path'
+import {StringDecoder} from 'string_decoder'
+import zlib from 'zlib'
+import {RequestLogger} from 'testcafe'
+
+const decoder = new StringDecoder('utf8')
+
+class MockDataRecorder {
+  constructor(
+    options = {capturePattern: /.*/, excludePattern: /exclude_this_pattern/, record: false, baseDir: ''},
+  ) {
+    this.options = options
+    this.logger = new RequestLogger()
+    this.writeMockData = this.writeMockData.bind(this)
+  }
+
+  async startRecording(t, mockData) {
+    if(!this.options.record) return
+
+    await t.removeRequestHooks(mockData)
+    this.logger = new RequestLogger(
+      request => {
+        const captureRegExp = this.options.capturePattern
+        const excludeRegExp = this.options.excludePattern
+        return captureRegExp.test(request.url) && !excludeRegExp.test(request.url)
+      },
+      {
+        logResponseBody: true,
+        logResponseHeaders: true,
+      },
+    )
+    await t.addRequestHooks(this.logger)
+  }
+
+  writeMockData(filename) {
+    if(!this.options.record) return
+
+    const filePath = path.join(this.options.baseDir, filename)
+    const {requests = []} = this.logger
+
+    const data = requests
+      .filter((elem, pos, arr) => {
+        return !!elem && arr.findIndex(subElem => subElem.request.url === elem.request.url) === pos
+      })
+      .map(loggedRequest => {
+        const url = loggedRequest.request.url
+        let response = '{}'
+        const rawBody = (response = (loggedRequest.response || {}).body)
+        const isGzip = ((loggedRequest.response || {}).headers || {})['content-encoding'] === 'gzip'
+
+        switch(true) {
+          case !!rawBody && isGzip:
+            response = decoder.write(zlib.unzipSync(rawBody))
+            break
+          case !!rawBody:
+            response = decoder.write(rawBody)
+            break
+          default:
+            response = '{}'
+        }
+
+        return {
+          url,
+          response,
+        }
+      })
+
+    const fileData = data
+      .map((rawResponse, index) => {
+        return `const callNumber${index} = ${rawResponse.response || '{}'}\n`
+      })
+      .join('\n')
+
+    const mockedFileData = data
+      .map((rawResponse, index) => {
+        return (
+          `callNumber${index}: new RequestMock()` +
+          `.onRequestTo('${rawResponse.url}')` +
+          `.respond(callNumber${index}, 200, {'access-control-allow-origin': '*'})`
+        )
+      })
+      .join(',')
+
+    const getAllMocksFn = 'mocks.all = Object.keys(mocks).map(key => mocks[key])\n'
+
+    const mockedFileDataObject = `const mocks = {${mockedFileData}}\n`
+
+    const fileDataString = [
+      "import {RequestMock} from 'testcafe'\n",
+      fileData,
+      mockedFileDataObject,
+      getAllMocksFn,
+      'export default mocks',
+    ].join('\n')
+
+    let prettifiedFileData
+
+    try {
+      prettifiedFileData = prettier.format(fileDataString, {
+        semi: false,
+        singleQuote: true,
+        trailingComma: 'all',
+        bracketSpacing: false,
+        printWidth: 100,
+      })
+    } catch(err) {
+      prettifiedFileData = fileDataString
+    }
+
+    fs.writeFileSync(filePath, prettifiedFileData)
+    console.log(`Mock data for ${filename} has been written`)
+  }
+}
+
+export default MockDataRecorder
