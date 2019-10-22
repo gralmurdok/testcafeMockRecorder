@@ -3,29 +3,30 @@ import fs from 'fs'
 import path from 'path'
 import {StringDecoder} from 'string_decoder'
 import zlib from 'zlib'
-import {RequestLogger} from 'testcafe'
 
 const decoder = new StringDecoder('utf8')
 
 class MockDataRecorder {
   constructor(
-    options = {capturePattern: /.*/, excludePattern: /exclude_this_pattern/, record: false, baseDir: ''},
+    options = {
+      RequestLogger: null,
+      predicate: null,
+      record: false, 
+      baseDir: ''
+    },
   ) {
     this.options = options
-    this.logger = new RequestLogger()
+    this.logger = null
     this.writeMockData = this.writeMockData.bind(this)
   }
 
   async startRecording(t, mockData) {
     if(!this.options.record) return
 
+    const {RequestLogger} = this.options
     await t.removeRequestHooks(mockData)
     this.logger = new RequestLogger(
-      request => {
-        const captureRegExp = this.options.capturePattern
-        const excludeRegExp = this.options.excludePattern
-        return captureRegExp.test(request.url) && !excludeRegExp.test(request.url)
-      },
+      this.options.predicate || /\.*/,
       {
         logResponseBody: true,
         logResponseHeaders: true,
@@ -37,7 +38,8 @@ class MockDataRecorder {
   writeMockData(filename) {
     if(!this.options.record) return
 
-    const filePath = path.join(this.options.baseDir, filename)
+    const {baseDir = ''} = this.options
+    const filePath = path.join(baseDir, filename)
     const {requests = []} = this.logger
 
     const data = requests
@@ -61,11 +63,19 @@ class MockDataRecorder {
             response = '{}'
         }
 
+        // check if the response is JSON
+        try {
+          JSON.parse(response)
+        } catch(err) {
+          return null
+        }
+
         return {
           url,
           response,
         }
       })
+      .filter(x => !!x)
 
     const fileData = data
       .map((rawResponse, index) => {
