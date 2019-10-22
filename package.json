@@ -1,0 +1,25 @@
+{
+  "name": "testcafe-mock-recorder",
+  "version": "1.0.0",
+  "description": "Library dedicated to auto-generate mock data for testcafe e2e tests",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "testcafe",
+    "mock",
+    "requestlogger",
+    "requesmock"
+  ],
+  "author": "Luis Tinitana",
+  "license": "ISC",
+  "dependencies": {
+    "prettier": "^1.18.2",
+    "uglify-js": "^3.6.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
+  }
+}
