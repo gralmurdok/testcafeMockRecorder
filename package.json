@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "babel src -d build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest test/"
   },
   "keywords": [
     "testcafe",
@@ -16,11 +16,15 @@
   "author": "Luis Tinitana",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.6.3",
     "prettier": "^1.18.2",
+    "testcafe": "^1.6.0",
     "uglify-js": "^3.6.3"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0"
+    "jest": "^24.9.0"
   }
 }
