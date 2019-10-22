@@ -4,7 +4,7 @@
   "description": "Library dedicated to auto-generate mock data for testcafe e2e tests",
   "main": "build/index.js",
   "scripts": {
-    "build": "babel src -d build",
+    "build": "babel src -d build && uglifyjs build/index.js -o build/index.js",
     "test": "jest test/"
   },
   "keywords": [
@@ -16,15 +16,16 @@
   "author": "Luis Tinitana",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.6.3",
     "prettier": "^1.18.2",
-    "testcafe": "^1.6.0",
-    "uglify-js": "^3.6.3"
+    "testcafe": "^1.6.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
     "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/preset-env": "^7.6.3",
-    "babel-cli": "^6.26.0",
-    "jest": "^24.9.0"
+    "@babel/runtime": "^7.6.3",
+    "jest": "^24.9.0",
+    "uglify-js": "^3.6.3"
   }
 }
