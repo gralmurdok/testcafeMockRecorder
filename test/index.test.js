@@ -4,11 +4,16 @@ import zlib from 'zlib'
 
 describe('testcafe-mock-recorder', () => {
   let recorder
+  class MockClass {}
 
   beforeEach(() => {
     recorder = new MockDataRecorder({
-      capturePattern: /testPattern/,
-      excludePattern: /excludeThisPattern/,
+      RequestLogger: MockClass,
+      predicate: request => {
+        const captureRegExp = /.*/
+        const excludeRegExp = /exclude_this_pattern/
+        return captureRegExp.test(request.url) && !excludeRegExp.test(request.url)
+      },
       record: true,
       baseDir: 'customdir'
     })
@@ -75,7 +80,7 @@ describe('testcafe-mock-recorder', () => {
             url: 'https://url.com/testPattern'
           },
           response: {
-            body: "{testParam: 'testValue'}"
+            body: `{"testParam":"testValue"}`
           }
         }]
       }
