@@ -20,7 +20,7 @@ class MockDataRecorder {
     this.writeMockData = this.writeMockData.bind(this)
   }
 
-  async startRecording(t, mockData) {
+  async startRecording(t, mockData = []) {
     if(!this.options.record) return
 
     const {RequestLogger} = this.options
