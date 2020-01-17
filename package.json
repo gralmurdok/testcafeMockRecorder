@@ -1,6 +1,6 @@
 {
   "name": "testcafe-mock-recorder",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Library dedicated to auto-generate mock data for testcafe e2e tests",
   "main": "build/index.js",
   "scripts": {
@@ -16,15 +16,14 @@
   "author": "Luis Tinitana",
   "license": "ISC",
   "dependencies": {
-    "prettier": "^1.18.2",
-    "testcafe": "1.2.0"
+    "@babel/runtime": "^7.6.3",
+    "prettier": "^1.18.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",
     "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/preset-env": "^7.6.3",
-    "@babel/runtime": "^7.6.3",
     "jest": "^24.9.0",
     "uglify-js": "^3.6.3"
   }
