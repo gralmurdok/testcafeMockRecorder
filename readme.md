@@ -5,7 +5,7 @@ A simple JS library that allow us to automatically record the JSON data from API
 ### Installation
 
 ```javascript
-npm install testcafeMockRecorder
+npm install testcafe-mock-recorder
 ```
 
 ### Usage
