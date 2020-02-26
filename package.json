@@ -1,6 +1,6 @@
 {
   "name": "testcafe-mock-recorder",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Library dedicated to auto-generate mock data for testcafe e2e tests",
   "main": "build/index.js",
   "scripts": {
