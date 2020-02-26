@@ -63,3 +63,6 @@ test('My first test', async t => {
   testcafeRecorder.writeMockData('testFile.js')
 }).requestHooks(testFileData.all) // attach the mocks to the test
 ```
+
+## Want to contribute, feedback, questions?
+Github: https://github.com/gralmurdok/testcafeMockRecorder
